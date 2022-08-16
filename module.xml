@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<Module name="replaceme" id="f65bd1f5-38c6-42c0-9b4e-d527836089e0" version="1.0.0">
+<Module name="MPLAB Event Recorder" id="f65bd1f5-38c6-42c0-9b4e-d527836089e0" version="1.0.0">
     <ConfigRoot path="config/module.py"/>
 </Module>
