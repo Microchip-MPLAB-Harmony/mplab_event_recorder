@@ -39,12 +39,13 @@ numFileCntr = 0
 modulePath = os.path.expanduser(Module.getPath())
 
 TRANSFER_MODE = 0
+SYS_CORE_CLOCK = 100000000
 EVENT_RECORD_COUNT = 64
 EVENT_TIMESTAMP_SOURCE = 0
 EVENT_TIMESTAMP_FREQ = 0
 
 def instantiateComponent(component):
-    global TRANSFER_MODE, EVENT_RECORD_COUNT, EVENT_TIMESTAMP_SOURCE, EVENT_TIMESTAMP_FREQ
+    global TRANSFER_MODE, SYS_CORE_CLOCK, EVENT_RECORD_COUNT, EVENT_TIMESTAMP_SOURCE, EVENT_TIMESTAMP_FREQ
     mode = component.createKeyValueSetSymbol("TransferMode", None)
     mode.setLabel("Transfer Mode")
     mode.addKey("Buffer", "0", "")
@@ -52,6 +53,13 @@ def instantiateComponent(component):
     mode.setOutputMode("Value")
     mode.setDisplayMode("Key")
     mode.setDefaultValue(TRANSFER_MODE)
+
+    clock = component.createIntegerSymbol("SysCoreClock", None)
+    clock.setLabel("System Core Clock Frequency [Hz]")
+    clock.setDefaultValue(SYS_CORE_CLOCK)
+    clock.setMin(0)
+    clock.setMax(1000000000)
+    clock.setDependencies(onTransferModeChanged, ["TransferMode"])
 
     count = component.createIntegerSymbol("EventRecordCount", None)
     count.setLabel("Number of Records")
@@ -85,7 +93,7 @@ def instantiateComponent(component):
     generatedFiles = AddFilesDir(component, ".generated", "*", "events", "events")
     for generatedFile in generatedFiles:
         if generatedFile.getOutputName() == _RTE_COMPONENTS_H:
-            generatedFile.setDependencies(onConfigurationChanged, ["TransferMode"])
+            generatedFile.setDependencies(onConfigurationChanged, ["TransferMode", "SysCoreClock"])
         elif generatedFile.getOutputName() == _EVENTRECORDERCONF_H:
             generatedFile.setDependencies(onConfigurationChanged, ["EventRecordCount", "EventTimeStampSource", "EventTimestampFreq"])
 
@@ -100,10 +108,12 @@ def onTransferModeChanged(symbol, event):
 
 
 def onConfigurationChanged(symbol, event):
-    global TRANSFER_MODE, EVENT_RECORD_COUNT, EVENT_TIMESTAMP_SOURCE, EVENT_TIMESTAMP_FREQ
+    global TRANSFER_MODE, SYS_CORE_CLOCK, EVENT_RECORD_COUNT, EVENT_TIMESTAMP_SOURCE, EVENT_TIMESTAMP_FREQ
     symObj = event['symbol']
     if event["id"] == "TransferMode":
         TRANSFER_MODE = int(symObj.getSelectedValue())
+    elif event["id"] == "SysCoreClock":
+        SYS_CORE_CLOCK = int(symObj.getValue())
     elif event["id"] == "EventRecordCount":
         EVENT_RECORD_COUNT = int(symObj.getValue())
     elif event["id"] == "EventTimeStampSource":
@@ -143,13 +153,13 @@ def AddFile(component, src_path, dest_path, proj_path, file_type = "SOURCE", isM
 
 
 def generate_headers():
-    global TRANSFER_MODE, EVENT_RECORD_COUNT, EVENT_TIMESTAMP_SOURCE, EVENT_TIMESTAMP_FREQ
+    global TRANSFER_MODE, SYS_CORE_CLOCK, EVENT_RECORD_COUNT, EVENT_TIMESTAMP_SOURCE, EVENT_TIMESTAMP_FREQ
     environment = Environment(loader=FileSystemLoader(modulePath + os.sep + _TEMPLATES_PATH))
     rte_template = environment.get_template(_RTE_COMPONENTS_JINJA)
     conf_template = environment.get_template(_EVENTRECORDERCONF_JINJA)
     processor = Variables.get("__PROCESSOR").lower()
     header = "\"" + processor.lstrip("at") + ".h\""
-    rte_content = rte_template.render(header=header, mode=TRANSFER_MODE)
+    rte_content = rte_template.render(header=header, mode=TRANSFER_MODE, clock=SYS_CORE_CLOCK)
     conf_content = conf_template.render(count=EVENT_RECORD_COUNT, source=EVENT_TIMESTAMP_SOURCE, freq=EVENT_TIMESTAMP_FREQ)
     outputDir = modulePath + ".generated"
     if not os.path.isdir(outputDir):
