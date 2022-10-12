@@ -63,6 +63,7 @@ def instantiateComponent(component):
 
     count = component.createKeyValueSetSymbol("EventRecordcount", None)
     count.setLabel("Number of Records")
+    
     count.addKey("8", "8", "")
     count.addKey("16", "16", "")
     count.addKey("32", "32", "")
@@ -77,6 +78,7 @@ def instantiateComponent(component):
     count.addKey("16384", "16384", "")
     count.addKey("32768", "32768", "")
     count.addKey("65536", "65536", "")
+
     count.setOutputMode("Value")
     count.setDisplayMode("Key")
     count.setDefaultValue(EVENT_RECORD_COUNT)
