@@ -28,6 +28,7 @@ import tempfile
 from jinja2 import Environment, FileSystemLoader
 
 _LIB_PATHS = "CMSIS-View-1.1.1/EventRecorder/**/*"
+_RTOS_PATHS = "RTOS/*"
 _TEMPLATES_PATH = "templates"
 _RTE_COMPONENTS_JINJA = "RTE_Components.jinja"
 _EVENTRECORDERCONF_JINJA = "EventRecorderConf.jinja"
@@ -38,28 +39,19 @@ numFileCntr = 0
 
 modulePath = os.path.expanduser(Module.getPath())
 
-TRANSFER_MODE = 0
 SYS_CORE_CLOCK = 100000000
 EVENT_RECORD_COUNT = 64
 EVENT_TIMESTAMP_SOURCE = 0
 EVENT_TIMESTAMP_FREQ = 0
 
 def instantiateComponent(component):
-    global TRANSFER_MODE, SYS_CORE_CLOCK, EVENT_RECORD_COUNT, EVENT_TIMESTAMP_SOURCE, EVENT_TIMESTAMP_FREQ
-    mode = component.createKeyValueSetSymbol("TransferMode", None)
-    mode.setLabel("Transfer Mode")
-    mode.addKey("Buffer", "0", "")
-    mode.addKey("ITM", "1", "")
-    mode.setOutputMode("Value")
-    mode.setDisplayMode("Key")
-    mode.setDefaultValue(TRANSFER_MODE)
+    global SYS_CORE_CLOCK, EVENT_RECORD_COUNT, EVENT_TIMESTAMP_SOURCE, EVENT_TIMESTAMP_FREQ
 
     clock = component.createIntegerSymbol("SysCoreClock", None)
     clock.setLabel("System Core Clock Frequency [Hz]")
     clock.setDefaultValue(SYS_CORE_CLOCK)
     clock.setMin(0)
     clock.setMax(1000000000)
-    clock.setDependencies(onTransferModeChanged, ["TransferMode"])
 
     count = component.createKeyValueSetSymbol("EventRecordCount", None)
     count.setLabel("Number of Records")
@@ -80,7 +72,6 @@ def instantiateComponent(component):
     count.setOutputMode("Value")
     count.setDisplayMode("Value")
     count.setDefaultValue(3)
-    count.setDependencies(onTransferModeChanged, ["TransferMode"])
 
     source = component.createKeyValueSetSymbol("EventTimeStampSource", None)
     source.setLabel("Time Stamp Source")
@@ -92,14 +83,16 @@ def instantiateComponent(component):
     source.setOutputMode("Value")
     source.setDisplayMode("Key")
     source.setDefaultValue(EVENT_TIMESTAMP_SOURCE)
-    source.setDependencies(onTransferModeChanged, ["TransferMode"])
 
     freq = component.createIntegerSymbol("EventTimestampFreq", None)
     freq.setLabel("Time Stamp Clock Frequency [Hz]")
     freq.setDefaultValue(EVENT_TIMESTAMP_FREQ)
     freq.setMin(0)
     freq.setMax(1000000000)
-    freq.setDependencies(onTransferModeChanged, ["TransferMode"])
+    
+    rtos = component.createBooleanSymbol("FreeRTOSHooks", None)
+    rtos.setLabel("Enable FreeRTOS Hooks")
+    rtos.setDefaultValue(False)
 
     generate_headers()
 
@@ -107,34 +100,32 @@ def instantiateComponent(component):
     generatedFiles = AddFilesDir(component, ".generated", "*", "events", "events")
     for generatedFile in generatedFiles:
         if generatedFile.getOutputName() == _RTE_COMPONENTS_H:
-            generatedFile.setDependencies(onConfigurationChanged, ["TransferMode", "SysCoreClock"])
+            generatedFile.setDependencies(onConfigurationChanged, ["SysCoreClock"])
         elif generatedFile.getOutputName() == _EVENTRECORDERCONF_H:
             generatedFile.setDependencies(onConfigurationChanged, ["EventRecordCount", "EventTimeStampSource", "EventTimestampFreq"])
-
-def onTransferModeChanged(symbol, event):
-    symObj = event['symbol']
-    selected_key = symObj.getSelectedKey()
-
-    if selected_key == "Buffer":
-        symbol.setVisible(True)
-    elif selected_key == "ITM":
-        symbol.setVisible(False)
+    rtosHookFiles = AddFilesDir(component, "lib", _RTOS_PATHS, "events", "events")
+    for rtosHookFile in rtosHookFiles:
+        rtosHookFile.setDependencies(onConfigurationChanged, ["FreeRTOSHooks"])
 
 
 def onConfigurationChanged(symbol, event):
-    global TRANSFER_MODE, SYS_CORE_CLOCK, EVENT_RECORD_COUNT, EVENT_TIMESTAMP_SOURCE, EVENT_TIMESTAMP_FREQ
+    global SYS_CORE_CLOCK, EVENT_RECORD_COUNT, EVENT_TIMESTAMP_SOURCE, EVENT_TIMESTAMP_FREQ
     symObj = event['symbol']
-    if event["id"] == "TransferMode":
-        TRANSFER_MODE = int(symObj.getSelectedValue())
-    elif event["id"] == "SysCoreClock":
+    if event["id"] == "SysCoreClock":
         SYS_CORE_CLOCK = int(symObj.getValue())
+        generate_headers()
     elif event["id"] == "EventRecordCount":
         EVENT_RECORD_COUNT = int(symObj.getSelectedValue())
+        generate_headers()
     elif event["id"] == "EventTimeStampSource":
         EVENT_TIMESTAMP_SOURCE = int(symObj.getSelectedValue())
+        generate_headers()
     elif event["id"] == "EventTimestampFreq":
         EVENT_TIMESTAMP_FREQ = int(symObj.getValue())
-    generate_headers()
+        generate_headers()
+    elif event["id"] == "FreeRTOSHooks":
+        symbol.setEnabled(bool(symObj.getValue()))
+
 
 def AddFilesDir(component, base_path, search_pattern, destination_path, project_path, enable=True):
     filelist = glob.iglob(modulePath + os.sep + base_path + os.sep + search_pattern)
@@ -167,13 +158,13 @@ def AddFile(component, src_path, dest_path, proj_path, file_type = "SOURCE", isM
 
 
 def generate_headers():
-    global TRANSFER_MODE, SYS_CORE_CLOCK, EVENT_RECORD_COUNT, EVENT_TIMESTAMP_SOURCE, EVENT_TIMESTAMP_FREQ
+    global SYS_CORE_CLOCK, EVENT_RECORD_COUNT, EVENT_TIMESTAMP_SOURCE, EVENT_TIMESTAMP_FREQ
     environment = Environment(loader=FileSystemLoader(modulePath + os.sep + _TEMPLATES_PATH))
     rte_template = environment.get_template(_RTE_COMPONENTS_JINJA)
     conf_template = environment.get_template(_EVENTRECORDERCONF_JINJA)
     processor = Variables.get("__PROCESSOR").lower()
     header = "\"" + processor.lstrip("at") + ".h\""
-    rte_content = rte_template.render(header=header, mode=TRANSFER_MODE, clock=SYS_CORE_CLOCK)
+    rte_content = rte_template.render(header=header, clock=SYS_CORE_CLOCK)
     conf_content = conf_template.render(count=EVENT_RECORD_COUNT, source=EVENT_TIMESTAMP_SOURCE, freq=EVENT_TIMESTAMP_FREQ)
     outputDir = modulePath + ".generated"
     if not os.path.isdir(outputDir):
@@ -182,3 +173,4 @@ def generate_headers():
         file.write(rte_content)
     with open( outputDir + os.sep + _EVENTRECORDERCONF_H, "w") as file:
         file.write(conf_content)
+
