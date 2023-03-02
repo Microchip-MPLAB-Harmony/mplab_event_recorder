@@ -90,8 +90,8 @@ def instantiateComponent(component):
     freq.setMin(0)
     freq.setMax(1000000000)
     
-    rtos = component.createBooleanSymbol("FreeRTOSHooks", None)
-    rtos.setLabel("Enable FreeRTOS Hooks")
+    rtos = component.createBooleanSymbol("RTOSSupport", None)
+    rtos.setLabel("Enable Free RTOS Support")
     rtos.setDefaultValue(False)
 
     generate_headers()
@@ -103,10 +103,10 @@ def instantiateComponent(component):
             generatedFile.setDependencies(onConfigurationChanged, ["SysCoreClock"])
         elif generatedFile.getOutputName() == _EVENTRECORDERCONF_H:
             generatedFile.setDependencies(onConfigurationChanged, ["EventRecordCount", "EventTimeStampSource", "EventTimestampFreq"])
-    rtosHookFiles = AddFilesDir(component, "lib", _RTOS_PATHS, "event_recorder", "event_recorder")
-    for rtosHookFile in rtosHookFiles:
-        rtosHookFile.setDependencies(onConfigurationChanged, ["FreeRTOSHooks"])
-        rtosHookFile.setEnabled(False)
+    RTOSFiles = AddFilesDir(component, "lib", _RTOS_PATHS, "event_recorder", "event_recorder")
+    for RTOSFile in RTOSFiles:
+        RTOSFile.setDependencies(onConfigurationChanged, ["RTOSSupport"])
+        RTOSFile.setEnabled(False)
 
 
 def onConfigurationChanged(symbol, event):
@@ -124,7 +124,7 @@ def onConfigurationChanged(symbol, event):
     elif event["id"] == "EventTimestampFreq":
         EVENT_TIMESTAMP_FREQ = int(symObj.getValue())
         generate_headers()
-    elif event["id"] == "FreeRTOSHooks":
+    elif event["id"] == "RTOSSupport":
         symbol.setEnabled(bool(symObj.getValue()))
 
 
@@ -133,13 +133,20 @@ def AddFilesDir(component, base_path, search_pattern, destination_path, project_
     files = []
     for x in filelist:
         _, ext = os.path.splitext(x)
-        if ext in ['.c','.h']:
+        if ext in ['.c','.h', '.scvd']:
             source_path = os.path.relpath(os.path.abspath(x), modulePath)
             file_name = os.path.basename(source_path)
             file_destination = destination_path
             file_project = project_path + '/' + file_name
+            file_type = 'STRING'
+            if ext is '.h':
+                file_type = 'HEADER'
+            elif ext is '.c':
+                file_type = 'SOURCE'
+            elif ext is '.scvd':
+                file_type = 'IMPORTANT'
             files.append(AddFile(component, source_path, file_destination, file_project.replace('\\','/'),
-                         file_type='HEADER' if ext is 'h' else 'SOURCE', enable=enable))
+                         file_type=file_type, enable=enable))
     return files
 
 
