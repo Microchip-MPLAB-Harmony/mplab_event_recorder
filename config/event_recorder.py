@@ -138,15 +138,8 @@ def AddFilesDir(component, base_path, search_pattern, destination_path, project_
             file_name = os.path.basename(source_path)
             file_destination = destination_path
             file_project = project_path + '/' + file_name
-            file_type = 'STRING'
-            if ext is '.h':
-                file_type = 'HEADER'
-            elif ext is '.c':
-                file_type = 'SOURCE'
-            elif ext is '.scvd':
-                file_type = 'IMPORTANT'
             files.append(AddFile(component, source_path, file_destination, file_project.replace('\\','/'),
-                         file_type=file_type, enable=enable))
+                         file_type='HEADER' if ext == '.h' else ('SOURCE' if ext == '.c' else 'IMPORTANT'), enable=enable))
     return files
 
 
