@@ -96,16 +96,17 @@ def instantiateComponent(component):
 
     generate_headers()
 
-    AddFilesDir(component, "lib", _LIB_PATHS, "events", "events")
-    generatedFiles = AddFilesDir(component, ".generated", "*", "events", "events")
+    AddFilesDir(component, "lib", _LIB_PATHS, "event_recorder", "event_recorder")
+    generatedFiles = AddFilesDir(component, ".generated", "*", "event_recorder", "event_recorder")
     for generatedFile in generatedFiles:
         if generatedFile.getOutputName() == _RTE_COMPONENTS_H:
             generatedFile.setDependencies(onConfigurationChanged, ["SysCoreClock"])
         elif generatedFile.getOutputName() == _EVENTRECORDERCONF_H:
             generatedFile.setDependencies(onConfigurationChanged, ["EventRecordCount", "EventTimeStampSource", "EventTimestampFreq"])
-    rtosHookFiles = AddFilesDir(component, "lib", _RTOS_PATHS, "events", "events")
+    rtosHookFiles = AddFilesDir(component, "lib", _RTOS_PATHS, "event_recorder", "event_recorder")
     for rtosHookFile in rtosHookFiles:
         rtosHookFile.setDependencies(onConfigurationChanged, ["FreeRTOSHooks"])
+        rtosHookFile.setEnabled(False)
 
 
 def onConfigurationChanged(symbol, event):
