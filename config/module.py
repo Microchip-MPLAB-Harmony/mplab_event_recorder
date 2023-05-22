@@ -1,5 +1,5 @@
 #/*****************************************************************************
-# Copyright (C) 2013-2018 Microchip Technology Inc. and its subsidiaries.
+# Copyright (C) 2013-2023 Microchip Technology Inc. and its subsidiaries.
 #
 # Microchip Technology Inc. and its subsidiaries.
 #
@@ -24,7 +24,6 @@
 # *****************************************************************************/
 
 def loadModule():
-    print("Load Module: Event Recorder")
-    cryptoComponent = Module.CreateComponent("lib_event_recorder",
-                                             "MPLAB Event Recorder",
-                                             "/Libraries/", "config/event_recorder.py")
+    component = Module.CreateComponent("lib_event_recorder",
+                                       "MPLAB Event Recorder",
+                                       "/Libraries/", "config/event_recorder.py")

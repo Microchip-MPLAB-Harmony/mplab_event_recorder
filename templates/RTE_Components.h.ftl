@@ -1,4 +1,3 @@
-{# templates/RTE_Components.h #}
 /*
  * Auto generated Run-Time-Environment Configuration File
  *      *** Do not modify ! ***
@@ -13,8 +12,8 @@
  * Define the Device Header File: 
  */
 
-#define CMSIS_device_header {{ header }}
+#define CMSIS_device_header ${DEVICE_HEADER}
 
-#define SystemCoreClock {{ clock }}
+#define SystemCoreClock ${SYSTEM_CORE_CLOCK}
 
 #endif /* RTE_COMPONENTS_H */

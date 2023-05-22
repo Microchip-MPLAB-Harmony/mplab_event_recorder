@@ -1,5 +1,5 @@
 #/*****************************************************************************
-# Copyright (C) 2013-2019 Microchip Technology Inc. and its subsidiaries.
+# Copyright (C) 2013-2023 Microchip Technology Inc. and its subsidiaries.
 #
 # Microchip Technology Inc. and its subsidiaries.
 #
@@ -23,37 +23,9 @@
 # THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
 # *****************************************************************************/
 import os
-import glob
-import tempfile
-from jinja2 import Environment, FileSystemLoader
-
-_LIB_PATHS = "CMSIS-View-1.1.1/EventRecorder/**/*"
-_RTOS_PATHS = "RTOS/*"
-_TEMPLATES_PATH = "templates"
-_RTE_COMPONENTS_JINJA = "RTE_Components.jinja"
-_EVENTRECORDERCONF_JINJA = "EventRecorderConf.jinja"
-_RTE_COMPONENTS_H = "RTE_Components.h"
-_EVENTRECORDERCONF_H = "EventRecorderConf.h"
-fileSymbolName = "EventRecorderSource"
-numFileCntr = 0
-
-modulePath = os.path.expanduser(Module.getPath())
-
-SYS_CORE_CLOCK = 100000000
-EVENT_RECORD_COUNT = 64
-EVENT_TIMESTAMP_SOURCE = 0
-EVENT_TIMESTAMP_FREQ = 0
 
 def instantiateComponent(component):
-    global SYS_CORE_CLOCK, EVENT_RECORD_COUNT, EVENT_TIMESTAMP_SOURCE, EVENT_TIMESTAMP_FREQ
-
-    clock = component.createIntegerSymbol("SysCoreClock", None)
-    clock.setLabel("System Core Clock Frequency [Hz]")
-    clock.setDefaultValue(SYS_CORE_CLOCK)
-    clock.setMin(0)
-    clock.setMax(1000000000)
-
-    count = component.createKeyValueSetSymbol("EventRecordCount", None)
+    count = component.createKeyValueSetSymbol("EVENT_RECORD_COUNT", None)
     count.setLabel("Number of Records")
     count.addKey("0", "8", "")
     count.addKey("1", "16", "")
@@ -73,7 +45,7 @@ def instantiateComponent(component):
     count.setDisplayMode("Value")
     count.setDefaultValue(3)
 
-    source = component.createKeyValueSetSymbol("EventTimeStampSource", None)
+    source = component.createKeyValueSetSymbol("EVENT_TIMESTAMP_SOURCE", None)
     source.setLabel("Time Stamp Source")
     source.addKey("DWT Cycle Counter", "0", "")
     source.addKey("SysTick", "1", "")
@@ -82,96 +54,89 @@ def instantiateComponent(component):
     source.addKey("User Timer(Power-On Reset)", "4", "")
     source.setOutputMode("Value")
     source.setDisplayMode("Key")
-    source.setDefaultValue(EVENT_TIMESTAMP_SOURCE)
+    source.setDefaultValue(0)
 
-    freq = component.createIntegerSymbol("EventTimestampFreq", None)
+    freq = component.createIntegerSymbol("EVENT_TIMESTAMP_FREQ", None)
     freq.setLabel("Time Stamp Clock Frequency [Hz]")
-    freq.setDefaultValue(EVENT_TIMESTAMP_FREQ)
+    freq.setDefaultValue(0)
     freq.setMin(0)
     freq.setMax(1000000000)
     
-    rtos = component.createBooleanSymbol("RTOSSupport", None)
-    rtos.setLabel("Enable Free RTOS Support")
-    rtos.setDefaultValue(False)
+    eventConfigHeaderFile = component.createFileSymbol("EVENT_RECORDER_CONF_HEADER", None)
+    eventConfigHeaderFile.setSourcePath("templates/EventRecorderConf.h.ftl")
+    eventConfigHeaderFile.setOutputName("EventRecorderConf.h")
+    eventConfigHeaderFile.setMarkup(True)
+    eventConfigHeaderFile.setDestPath("event_recorder")
+    eventConfigHeaderFile.setProjectPath("event_recorder")
+    eventConfigHeaderFile.setType("HEADER")
 
-    generate_headers()
-
-    AddFilesDir(component, "lib", _LIB_PATHS, "event_recorder", "event_recorder")
-    generatedFiles = AddFilesDir(component, ".generated", "*", "event_recorder", "event_recorder")
-    for generatedFile in generatedFiles:
-        if generatedFile.getOutputName() == _RTE_COMPONENTS_H:
-            generatedFile.setDependencies(onConfigurationChanged, ["SysCoreClock"])
-        elif generatedFile.getOutputName() == _EVENTRECORDERCONF_H:
-            generatedFile.setDependencies(onConfigurationChanged, ["EventRecordCount", "EventTimeStampSource", "EventTimestampFreq"])
-    RTOSFiles = AddFilesDir(component, "lib", _RTOS_PATHS, "event_recorder", "event_recorder")
-    for RTOSFile in RTOSFiles:
-        RTOSFile.setDependencies(onConfigurationChanged, ["RTOSSupport"])
-        RTOSFile.setEnabled(False)
-
-
-def onConfigurationChanged(symbol, event):
-    global SYS_CORE_CLOCK, EVENT_RECORD_COUNT, EVENT_TIMESTAMP_SOURCE, EVENT_TIMESTAMP_FREQ
-    symObj = event['symbol']
-    if event["id"] == "SysCoreClock":
-        SYS_CORE_CLOCK = int(symObj.getValue())
-        generate_headers()
-    elif event["id"] == "EventRecordCount":
-        EVENT_RECORD_COUNT = int(symObj.getSelectedValue())
-        generate_headers()
-    elif event["id"] == "EventTimeStampSource":
-        EVENT_TIMESTAMP_SOURCE = int(symObj.getSelectedValue())
-        generate_headers()
-    elif event["id"] == "EventTimestampFreq":
-        EVENT_TIMESTAMP_FREQ = int(symObj.getValue())
-        generate_headers()
-    elif event["id"] == "RTOSSupport":
-        symbol.setEnabled(bool(symObj.getValue()))
-
-
-def AddFilesDir(component, base_path, search_pattern, destination_path, project_path, enable=True):
-    filelist = glob.iglob(modulePath + os.sep + base_path + os.sep + search_pattern)
-    files = []
-    for x in filelist:
-        _, ext = os.path.splitext(x)
-        if ext in ['.c','.h', '.scvd']:
-            source_path = os.path.relpath(os.path.abspath(x), modulePath)
-            file_name = os.path.basename(source_path)
-            file_destination = destination_path
-            file_project = project_path + '/' + file_name
-            files.append(AddFile(component, source_path, file_destination, file_project.replace('\\','/'),
-                         file_type='HEADER' if ext == '.h' else ('SOURCE' if ext == '.c' else 'IMPORTANT'), enable=enable))
-    return files
-
-
-def AddFile(component, src_path, dest_path, proj_path, file_type = "SOURCE", isMarkup = False, enable=True):
-    global fileSymbolName
-    global numFileCntr
-    srcFile = component.createFileSymbol(fileSymbolName + str(numFileCntr) , None)
-    srcFile.setSourcePath(src_path)
-    srcFile.setDestPath(dest_path)
-    srcFile.setProjectPath(proj_path)
-    srcFile.setType(file_type)
-    srcFile.setOutputName(os.path.basename(src_path))
-    srcFile.setMarkup(isMarkup)
-    srcFile.setEnabled(enable)
-    numFileCntr += 1
-    return srcFile
-
-
-def generate_headers():
-    global SYS_CORE_CLOCK, EVENT_RECORD_COUNT, EVENT_TIMESTAMP_SOURCE, EVENT_TIMESTAMP_FREQ
-    environment = Environment(loader=FileSystemLoader(modulePath + os.sep + _TEMPLATES_PATH))
-    rte_template = environment.get_template(_RTE_COMPONENTS_JINJA)
-    conf_template = environment.get_template(_EVENTRECORDERCONF_JINJA)
+    coreClock = Database.getSymbolValue("core", "CPU_CLOCK_FREQUENCY")
     processor = Variables.get("__PROCESSOR").lower()
-    header = "\"" + processor.lstrip("at") + ".h\""
-    rte_content = rte_template.render(header=header, clock=SYS_CORE_CLOCK)
-    conf_content = conf_template.render(count=EVENT_RECORD_COUNT, source=EVENT_TIMESTAMP_SOURCE, freq=EVENT_TIMESTAMP_FREQ)
-    outputDir = modulePath + ".generated"
-    if not os.path.isdir(outputDir):
-        os.mkdir(outputDir)
-    with open( outputDir + os.sep + _RTE_COMPONENTS_H, "w") as file:
-        file.write(rte_content)
-    with open( outputDir + os.sep + _EVENTRECORDERCONF_H, "w") as file:
-        file.write(conf_content)
+    deviceHeader = "\"" + processor.lstrip("at") + ".h\""
 
+    RTEHeaderFile = component.createFileSymbol("RUNTIME_ENVIRONMENT_HEADER", None)
+    RTEHeaderFile.setSourcePath("templates/RTE_Components.h.ftl")
+    RTEHeaderFile.setOutputName("RTE_Components.h")
+    RTEHeaderFile.setMarkup(True)
+    RTEHeaderFile.setDestPath("event_recorder")
+    RTEHeaderFile.setProjectPath("event_recorder")
+    RTEHeaderFile.setType("HEADER")
+    RTEHeaderFile.addMarkupVariable("SYSTEM_CORE_CLOCK", coreClock)
+    RTEHeaderFile.addMarkupVariable("DEVICE_HEADER", deviceHeader)
+
+    EventRecorderHeader = component.createFileSymbol("EVENT_RECORDER_HEADER", None)
+    EventRecorderHeader.setSourcePath("lib/CMSIS-View-1.1.1/EventRecorder/Include/EventRecorder.h")
+    EventRecorderHeader.setOutputName("EventRecorder.h")
+    EventRecorderHeader.setDestPath("event_recorder")
+    EventRecorderHeader.setProjectPath("event_recorder")
+    EventRecorderHeader.setType("HEADER")
+
+    EventRecorderSource = component.createFileSymbol("EVENT_RECORDER_SOURCE", None)
+    EventRecorderSource.setSourcePath("lib/CMSIS-View-1.1.1/EventRecorder/Source/EventRecorder.c")
+    EventRecorderSource.setOutputName("EventRecorder.c")
+    EventRecorderSource.setDestPath("event_recorder")
+    EventRecorderSource.setProjectPath("event_recorder")
+    EventRecorderSource.setType("SOURCE")
+
+    RTOS_HOOK_HEADER = component.createFileSymbol("RTOS_HOOK_HEADER", None)
+    RTOS_HOOK_HEADER.setSourcePath("lib/RTOS/EventRecorderRTOSHook.h")
+    RTOS_HOOK_HEADER.setOutputName("EventRecorderRTOSHook.h")
+    RTOS_HOOK_HEADER.setDestPath("event_recorder")
+    RTOS_HOOK_HEADER.setProjectPath("event_recorder")
+    RTOS_HOOK_HEADER.setType("HEADER")
+    RTOS_HOOK_HEADER.setDependencies(includeRTOSFiles, ["HarmonyCore.SELECT_RTOS"])
+
+    RTOS_HOOK_SOURCE = component.createFileSymbol("RTOS_HOOK_SOURCE", None)
+    RTOS_HOOK_SOURCE.setSourcePath("lib/RTOS/EventRecorderRTOSHook.c")
+    RTOS_HOOK_SOURCE.setOutputName("EventRecorderRTOSHook.c")
+    RTOS_HOOK_SOURCE.setDestPath("event_recorder")
+    RTOS_HOOK_SOURCE.setProjectPath("event_recorder")
+    RTOS_HOOK_SOURCE.setType("SOURCE")
+    RTOS_HOOK_SOURCE.setDependencies(includeRTOSFiles, ["HarmonyCore.SELECT_RTOS"])
+
+    RTOS_TRACE_HEADER = component.createFileSymbol("RTOS_TRACE_HEADER", None)
+    RTOS_TRACE_HEADER.setSourcePath("lib/RTOS/EventRecorderRTOSTrace.h")
+    RTOS_TRACE_HEADER.setOutputName("EventRecorderRTOSTrace.h")
+    RTOS_TRACE_HEADER.setDestPath("event_recorder")
+    RTOS_TRACE_HEADER.setProjectPath("event_recorder")
+    RTOS_TRACE_HEADER.setType("HEADER")
+    RTOS_TRACE_HEADER.setDependencies(includeRTOSFiles, ["HarmonyCore.SELECT_RTOS"])
+
+    RTOS_TRACE_SOURCE = component.createFileSymbol("RTOS_TRACE_SOURCE", None)
+    RTOS_TRACE_SOURCE.setSourcePath("lib/RTOS/EventRecorderRTOSTrace.c")
+    RTOS_TRACE_SOURCE.setOutputName("EventRecorderRTOSTrace.c")
+    RTOS_TRACE_SOURCE.setDestPath("event_recorder")
+    RTOS_TRACE_SOURCE.setProjectPath("event_recorder")
+    RTOS_TRACE_SOURCE.setType("SOURCE")
+    RTOS_TRACE_SOURCE.setDependencies(includeRTOSFiles, ["HarmonyCore.SELECT_RTOS"])
+
+    RTOS_TRACE_SCVD = component.createFileSymbol("RTOS_TRACE_SCVD", None)
+    RTOS_TRACE_SCVD.setSourcePath("lib/RTOS/freertos_view.scvd")
+    RTOS_TRACE_SCVD.setOutputName("freertos_view.scvd")
+    RTOS_TRACE_SCVD.setDestPath("event_recorder")
+    RTOS_TRACE_SCVD.setProjectPath("event_recorder")
+    RTOS_TRACE_SCVD.setType("IMPORTANT")
+    RTOS_TRACE_SCVD.setDependencies(includeRTOSFiles, ["HarmonyCore.SELECT_RTOS"])
+
+def includeRTOSFiles(symbol, event):
+	symbol.setEnabled(event["value"] != None and event["value"] != "BareMetal")
