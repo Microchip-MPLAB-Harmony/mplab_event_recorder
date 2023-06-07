@@ -104,6 +104,7 @@ def instantiateComponent(component):
     RTOS_HOOK_HEADER.setDestPath("event_recorder")
     RTOS_HOOK_HEADER.setProjectPath("event_recorder")
     RTOS_HOOK_HEADER.setType("HEADER")
+    RTOS_HOOK_HEADER.setEnabled(False)
     RTOS_HOOK_HEADER.setDependencies(includeRTOSFiles, ["HarmonyCore.SELECT_RTOS"])
 
     RTOS_HOOK_SOURCE = component.createFileSymbol("RTOS_HOOK_SOURCE", None)
@@ -112,6 +113,7 @@ def instantiateComponent(component):
     RTOS_HOOK_SOURCE.setDestPath("event_recorder")
     RTOS_HOOK_SOURCE.setProjectPath("event_recorder")
     RTOS_HOOK_SOURCE.setType("SOURCE")
+    RTOS_HOOK_SOURCE.setEnabled(False)
     RTOS_HOOK_SOURCE.setDependencies(includeRTOSFiles, ["HarmonyCore.SELECT_RTOS"])
 
     RTOS_TRACE_HEADER = component.createFileSymbol("RTOS_TRACE_HEADER", None)
@@ -120,6 +122,7 @@ def instantiateComponent(component):
     RTOS_TRACE_HEADER.setDestPath("event_recorder")
     RTOS_TRACE_HEADER.setProjectPath("event_recorder")
     RTOS_TRACE_HEADER.setType("HEADER")
+    RTOS_TRACE_HEADER.setEnabled(False)
     RTOS_TRACE_HEADER.setDependencies(includeRTOSFiles, ["HarmonyCore.SELECT_RTOS"])
 
     RTOS_TRACE_SOURCE = component.createFileSymbol("RTOS_TRACE_SOURCE", None)
@@ -128,6 +131,7 @@ def instantiateComponent(component):
     RTOS_TRACE_SOURCE.setDestPath("event_recorder")
     RTOS_TRACE_SOURCE.setProjectPath("event_recorder")
     RTOS_TRACE_SOURCE.setType("SOURCE")
+    RTOS_TRACE_SOURCE.setEnabled(False)
     RTOS_TRACE_SOURCE.setDependencies(includeRTOSFiles, ["HarmonyCore.SELECT_RTOS"])
 
     RTOS_TRACE_SCVD = component.createFileSymbol("RTOS_TRACE_SCVD", None)
@@ -136,6 +140,7 @@ def instantiateComponent(component):
     RTOS_TRACE_SCVD.setDestPath("event_recorder")
     RTOS_TRACE_SCVD.setProjectPath("event_recorder")
     RTOS_TRACE_SCVD.setType("IMPORTANT")
+    RTOS_TRACE_SCVD.setEnabled(False)
     RTOS_TRACE_SCVD.setDependencies(includeRTOSFiles, ["HarmonyCore.SELECT_RTOS"])
 
 def includeRTOSFiles(symbol, event):
