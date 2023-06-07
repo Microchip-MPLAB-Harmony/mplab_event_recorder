@@ -1,0 +1,18 @@
+package:
+  format-version: "1.0.0"
+  name: "mplab_event_recorder"
+  type: "api"
+  status: "production"
+  required: true
+  version: "1.0.3"
+  
+  dependencies:
+    - name: "core"
+      type: "package"
+      version: "3.12.0"
+    - name: "csp"
+      type: "package"
+      version: "3.16.0"
+    - name: "CMSIS-View"
+      type: "package"
+      version: "1.1.0"

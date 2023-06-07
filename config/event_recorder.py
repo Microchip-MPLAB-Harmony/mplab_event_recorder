@@ -85,14 +85,14 @@ def instantiateComponent(component):
     RTEHeaderFile.addMarkupVariable("DEVICE_HEADER", deviceHeader)
 
     EventRecorderHeader = component.createFileSymbol("EVENT_RECORDER_HEADER", None)
-    EventRecorderHeader.setSourcePath("lib/CMSIS-View-1.1.1/EventRecorder/Include/EventRecorder.h")
+    EventRecorderHeader.setSourcePath("../CMSIS-View/EventRecorder/Include/EventRecorder.h")
     EventRecorderHeader.setOutputName("EventRecorder.h")
     EventRecorderHeader.setDestPath("event_recorder")
     EventRecorderHeader.setProjectPath("event_recorder")
     EventRecorderHeader.setType("HEADER")
 
     EventRecorderSource = component.createFileSymbol("EVENT_RECORDER_SOURCE", None)
-    EventRecorderSource.setSourcePath("lib/CMSIS-View-1.1.1/EventRecorder/Source/EventRecorder.c")
+    EventRecorderSource.setSourcePath("../CMSIS-View/EventRecorder/Source/EventRecorder.c")
     EventRecorderSource.setOutputName("EventRecorder.c")
     EventRecorderSource.setDestPath("event_recorder")
     EventRecorderSource.setProjectPath("event_recorder")
