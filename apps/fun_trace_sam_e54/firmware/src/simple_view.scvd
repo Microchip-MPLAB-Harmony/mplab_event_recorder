@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component_viewer schemaVersion="0.1" xmlns:xs="http://www.w3.org/2001/XMLSchema-instance" xs:noNamespaceSchemaLocation="Component_Viewer.xsd">
+    <component name="MyExample" version="1.0.0"/>    <!-- name and version of the component  -->
+    <events>
+        <group name="My Events Group">
+            <component name="MyApp" brief="My Application" no="0x4A" prefix="EvrNetMM_" info="Network - System - Dynamic Memory Management"/>
+        </group>  
+ 
+        <event id="0x4A01" level="Op" property="Task Create" value="fun create, number: %x[val1], name: %t[val2]%t[val3]%t[val4]" info="" />
+        <event id="0x4A02" level="Op" property="Task Switched in"  value="fun number: %x[val1]" info="" />
+        <event id="0x4A03" level="Op" property="Task Switched out" value="fun number: %x[val1]" info="" />
+    </events>
+    <plots>
+        <task name="Func">
+            <create id="0x4A01" tid_format="%x[val1]" tname_format="%t[val2]%t[val3]%t[val4]"/>
+            <switch_in id="0x4A02" tid_format="%x[val1]"/>
+            <switch_out id="0x4A03" tid_format="%x[val1]"/>
+        </task>
+        <cpu name="CPU percentage" ref="Task"/>
+        <line name="Value">
+            <update id="0x4A04" variable="value" expr="%d[val2]"/>
+        </line>
+        <table name="Table" ref="My Events Group"/>
+    </plots>
+</component_viewer>
