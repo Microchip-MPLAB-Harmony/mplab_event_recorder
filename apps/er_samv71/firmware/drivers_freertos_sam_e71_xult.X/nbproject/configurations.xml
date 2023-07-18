@@ -563,7 +563,7 @@
         <property key="debugoptions.useswbreakpoints" value="false"/>
         <property key="event.recorder.enabled" value="true"/>
         <property key="event.recorder.scvd.files"
-                  value="${ProjectDir}\..\src\config\sam_v71_xult\event_recorder\freertos_view.scvd"/>
+                  value="${ProjectDir}/../src/config/sam_v71_xult/event_recorder/freertos_view.scvd"/>
         <property key="firmware.path"
                   value="Press to browse for a specific firmware version"/>
         <property key="firmware.toolpack"
@@ -626,7 +626,7 @@
         <property key="debugoptions.useswbreakpoints" value="false"/>
         <property key="event.recorder.enabled" value="true"/>
         <property key="event.recorder.scvd.files"
-                  value="${ProjectDir}\..\src\config\sam_v71_xult\event_recorder\freertos_view.scvd"/>
+                  value="${ProjectDir}/../src/config/sam_v71_xult/event_recorder/freertos_view.scvd"/>
         <property key="hwtoolclock.clock.frequency" value="4"/>
         <property key="hwtoolclock.frcindebug" value="false"/>
         <property key="lastid" value=""/>
@@ -692,7 +692,7 @@
         <property key="debugoptions.useswbreakpoints" value="false"/>
         <property key="event.recorder.enabled" value="true"/>
         <property key="event.recorder.scvd.files"
-                  value="${ProjectDir}\..\src\config\sam_v71_xult\event_recorder\freertos_view.scvd"/>
+                  value="${ProjectDir}/../src/config/sam_v71_xult/event_recorder/freertos_view.scvd"/>
         <property key="firmware.path"
                   value="Press to browse for a specific firmware version"/>
         <property key="firmware.toolpack"

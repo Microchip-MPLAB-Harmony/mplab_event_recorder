@@ -6,9 +6,10 @@
             <component name="MyApp" brief="My Application" no="0x4A" prefix="EvrNetMM_" info="Network - System - Dynamic Memory Management"/>
         </group>  
  
-        <event id="0x4A01" level="Op" property="Task Create" value="fun create, number: %x[val1], name: %t[val2]%t[val3]%t[val4]" info="" />
-        <event id="0x4A02" level="Op" property="Task Switched in"  value="fun number: %x[val1]" info="" />
-        <event id="0x4A03" level="Op" property="Task Switched out" value="fun number: %x[val1]" info="" />
+        <event id="0x4A01" level="Op" property="Func Create" value="fun create, number: %x[val1], name: %t[val2]%t[val3]%t[val4]" info="" />
+        <event id="0x4A02" level="Op" property="Func Switched in"  value="fun number: %x[val1]" info="" />
+        <event id="0x4A03" level="Op" property="Func Switched out" value="fun number: %x[val1]" info="" />
+        <event id="0x4A04" level="Op" property="Value updated" value="value: %x[val2]" info="" />
     </events>
     <plots>
         <task name="Func">
@@ -16,7 +17,7 @@
             <switch_in id="0x4A02" tid_format="%x[val1]"/>
             <switch_out id="0x4A03" tid_format="%x[val1]"/>
         </task>
-        <cpu name="CPU percentage" ref="Task"/>
+        <cpu name="CPU percentage" ref="Func"/>
         <line name="Value">
             <update id="0x4A04" variable="value" expr="%d[val2]"/>
         </line>

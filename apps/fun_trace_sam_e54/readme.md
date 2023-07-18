@@ -73,9 +73,19 @@ You can create Fun2() and Fun3() in the same way.
 
 In the SCVD file for MPLABX, you will find the corresponding code:
 ```
-<switch_in id="0x4A02" tid_format="%x[val1]"/>
-<switch_out id="0x4A03" tid_format="%x[val1]"/>
+<task name="Func">
+    <create id="0x4A01" tid_format="%x[val1]" tname_format="%t[val2]%t[val3]%t[val4]"/>
+    <switch_in id="0x4A02" tid_format="%x[val1]"/>
+    <switch_out id="0x4A03" tid_format="%x[val1]"/>
+</task>
 ```
+
+## Tracking CPU usage of functions
+To track the percentage of time that the CPU is actively executing a function, you need to refer to the function definition section in the SCVD file.
+```
+<cpu name="CPU percentage" ref="Func"/>
+```
+The attribute ref="Func" means that the CPU percentage is calculated by the existing function events defined in the section <task name="Func">.
 
 ## Tracking value
 To track a value, the firmware and MPLABX agree to use a special event with ID=0x4A04 for updating a value. The first 4 bytes are not used, and the last 4 bytes represent the value. The following code can be found in the firmware, where the value is generated randomly.
