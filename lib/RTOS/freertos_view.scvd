@@ -107,8 +107,8 @@
             <switch_out id="0xA202" tid_format="%x[val1]"/>
         </task>
         <line name="RTOS Memory">
-            <update id="0xA401" variable="memory" expr="[val]+%d[val2]"/>
-            <update id="0xA402" variable="memory" expr="[val]-%d[val2]"/>
+            <update id="0xA401" variable="memory" expr="%d[val0+val2]"/>
+            <update id="0xA402" variable="memory" expr="%d[val0-val2]"/>
         </line>
         <cpu name="RTOS CPU" ref="RTOS Tasks"/>
         <table name="RTOS Events" ref="FreeRTOS Trace"/>
