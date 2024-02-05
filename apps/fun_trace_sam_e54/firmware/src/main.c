@@ -40,7 +40,7 @@
 
 void delayms(uint32_t ms) {
     uint32_t start, elapsed;
-    uint32_t count = ms * (SystemCoreClock / 1000000);
+    uint32_t count = ms * (SystemCoreClock / 1000);
 
     start = DWT->CYCCNT; //CYCCNT is 32bits, so no wrap problems till over 1 Hour
     while (1) {
@@ -67,7 +67,7 @@ void Fun1() {
 
     // do something
     RecordValue();
-    delayms(rand() % RAND_MAX * 100);
+    delayms(100);
 
     EventRecord2(0x4A03 + EventLevelOp, 1, 0); // Event at Finish
 }
@@ -77,7 +77,7 @@ void Fun2() {
 
     // do something
     RecordValue();
-    delayms(rand() % RAND_MAX * 100);
+    delayms(200);
 
     EventRecord2(0x4A03 + EventLevelOp, 2, 0); // Event at Finish
 }
@@ -87,7 +87,7 @@ void Fun3() {
 
     // do something
     RecordValue();
-    delayms(rand() % RAND_MAX * 100);
+    delayms(300);
 
     EventRecord2(0x4A03 + EventLevelOp, 3, 0); // Event at Finish
 }
