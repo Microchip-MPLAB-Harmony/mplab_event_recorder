@@ -42,7 +42,7 @@ The delay function is used in this example to mimic the application's activity, 
 ```
 void delayms(uint32_t ms) {
     uint32_t start, elapsed;
-    uint32_t count = ms * (SystemCoreClock / 1000000);
+    uint32_t count = ms * (SystemCoreClock / 1000);
 
     start = DWT->CYCCNT; //CYCCNT is 32bits, so no wrap problems till over 1 Hour
     while (1) {
@@ -61,14 +61,15 @@ void Fun1() {
 
     // do something
     RecordValue();
-    delayms(rand() % RAND_MAX * 100);
+    delayms(100);
 
     EventRecord2(0x4A03 + EventLevelOp, 1, 0); // Event at Finish
 }
 ```
 Each function performs the following two tasks:
 1. Calls RecordValue() to record a random variable.
-2. Delays for a random
+2. Delays for a 100ms  
+
 You can create Fun2() and Fun3() in the same way.
 
 In the SCVD file for MPLABX, you will find the corresponding code:

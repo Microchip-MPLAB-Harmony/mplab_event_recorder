@@ -32,32 +32,21 @@ The event view provides a graphical representation of tasks, CPU usage, and memo
 
 ## Installation
 
-1. Download and install MPLABX 6.10
-2. Install the last version of MCC plugin
-
-    To configure event recorder, simply install the MPLAB Code Configuration plugin. It enables generation and easy customization of configuration files.
-    To install MCC, floow these steps:
+1. Download and install MPLABX
+2. MCC plugins are installed by MPLABX installer by default. To confirm:
     - Navigate to Tools menu in MPLAB
     - Locate the plugin option
-    - Select MCC from the list of available plugins
+    - check MCC Content Manager and MPLAB Code Configurator are installed
 
     <img src="imgs/mccplugin.png" alt="MCC Plugin">
 
-3. Download Mplab Event Recorder package from content manager.
+3. Download Mplab Event Recorder package from MCC Content Manager.
 
-    3.1 Open MCC plugin 
+    3.1 Open MCC Content Manager 
     
     <img src="imgs/mccicon.png" alt="MCC Icon">
 
-    3.2 Navigate through the content manager wizard by accessing Harmony content
-
-    <img src="imgs/mcccontentmanagerwizard.png" alt="Content Manager Wizard">
-
-    Or open content manager from the device Resources panel in MCC
-
-    <img src="imgs/contentmanagerbutton.png" alt="Content Manager Button">
-
-    3.3 Download Mplab Event Recorder package from Content manager
+    3.2 Download Mplab Event Recorder package from Content manager
 
     <img src="imgs/eventrecorderpackage.png" alt="Event Recorder Package">
 
