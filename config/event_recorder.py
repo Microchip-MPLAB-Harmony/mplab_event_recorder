@@ -25,6 +25,9 @@
 import os
 
 def instantiateComponent(component):
+    Database.activateComponents(['HarmonyCore'])
+    component.addDependency('event_recorder_HarmonyCoreDependency', 'Core Service', 'Core Service', True, True)
+
     count = component.createKeyValueSetSymbol("EVENT_RECORD_COUNT", None)
     count.setLabel("Number of Records")
     count.addKey("0", "8", "")
@@ -144,4 +147,5 @@ def instantiateComponent(component):
     RTOS_TRACE_SCVD.setDependencies(includeRTOSFiles, ["HarmonyCore.SELECT_RTOS"])
 
 def includeRTOSFiles(symbol, event):
-	symbol.setEnabled(event["value"] != None and event["value"] != "BareMetal")
+    symbol.setEnabled(event["value"] != None and event["value"] != "BareMetal")
+

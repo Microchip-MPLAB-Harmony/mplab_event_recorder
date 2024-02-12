@@ -24,6 +24,5 @@
 # *****************************************************************************/
 
 def loadModule():
-    component = Module.CreateComponent("lib_event_recorder",
-                                       "MPLAB Event Recorder",
-                                       "/Libraries/", "config/event_recorder.py")
+    component = Module.CreateComponent("lib_event_recorder", "MPLAB Event Recorder", "/Libraries/", "config/event_recorder.py")
+

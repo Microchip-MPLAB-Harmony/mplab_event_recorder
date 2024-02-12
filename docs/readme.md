@@ -16,7 +16,7 @@
 
 MPLAB® Event Recorder utilizes the MCU's memory to store event notifications and transmit them via SWD. It is compatible with Cortex-M devices.
 
-MPLAB X has the capability to present the event log and transform the information into a more easily understandable format.
+MPLAB®X has the capability to present the event log and transform the information into a more easily understandable format.
 
 The formatting of event IDs and event data is determined by the SCVD file.
 
@@ -32,21 +32,21 @@ The event view provides a graphical representation of tasks, CPU usage, and memo
 
 ## Installation
 
-1. Download and install MPLABX
-2. MCC plugins are installed by MPLABX installer by default. To confirm:
-    - Navigate to Tools menu in MPLAB
+1. Download and install MPLAB®X
+2. MCC plugins are installed by MPLAB®X installer by default. To confirm:
+    - Navigate to Tools menu in MPLAB®X
     - Locate the plugin option
-    - check MCC Content Manager and MPLAB Code Configurator are installed
+    - check MCC Content Manager and MPLAB® Code Configurator are installed
 
     <img src="imgs/mccplugin.png" alt="MCC Plugin">
 
-3. Download Mplab Event Recorder package from MCC Content Manager.
+3. Download MPLAB® Event Recorder package from MCC Content Manager.
 
     3.1 Open MCC Content Manager 
     
     <img src="imgs/mccicon.png" alt="MCC Icon">
 
-    3.2 Download Mplab Event Recorder package from Content manager
+    3.2 Download MPLAB® Event Recorder package from Content manager
 
     <img src="imgs/eventrecorderpackage.png" alt="Event Recorder Package">
 
@@ -54,11 +54,11 @@ The event view provides a graphical representation of tasks, CPU usage, and memo
 
 ## Configuration
 
-1. To customize the configuration options of the Event Recorder, you can utilize the Mplab Code Configurator (MCC) plugin.
+1. To change the configuration options of the Event Recorder open the MPLAB® Code Configurator (MCC) plugin.
 
     <img src="imgs/configurationspanel.png" alt="MCCConfigurationsPanel">
 
-    Then press on generate source code button and you will see in the tree project the event Recorder configuration files added.
+    Click on generate source code button and you will see in the tree project the event Recorder configuration files added.
 
 2. Create the scvd file
 
@@ -67,7 +67,7 @@ The event view provides a graphical representation of tasks, CPU usage, and memo
 
 3. Configure the plots
 
-    Access the MPLAB Event Recorder through the Window Menu.
+    Access the MPLAB® Event Recorder through the Window Menu.
 
       <img src="imgs/eventrecordermenu.png" alt="Event Recorder Menu">
 
@@ -75,22 +75,22 @@ The event view provides a graphical representation of tasks, CPU usage, and memo
 
       <img src="imgs/eventrecorderaddlist.png" alt="Event Recorder dropdown list">
 
-    The layout of plots offers various customization options to enhance the user experience. You manipulate the plots by resize, drag and drop, zoom in/out and rotate. By using these features, you can personlize the arrangement and appearance of plots as wanted.
+    The layout of plots offers various customization options to enhance the user experience. You manipulate the plots by resize, drag and drop, zoom in/out and rotate. By using these features, you can customize the arrangement and appearance of plots as wanted.
 
       <img src="imgs/emptypanels.png" alt="Event Recorder main window without data">
 
-    Once you have configured the necessary settings, you are ready to begin visualize data. By starting a debug session, you can observe the continous population of information.
+    Once you have configured the necessary settings, you are ready to begin visualize data. By starting a debug session, you can observe the continuous population of information.
 
       <img src="imgs/plotswithdata.png" alt="Event Recorder plots with data">
 
-    The user has the option to save a snapshot of the analyzed data to a file, allowing for future reference. This snapshot can be loaded whenever needed. Additionnaly, the user can clear the plots to remove the displayed data.
+    You can save a snapshot of the analyzed data to a file. The snapshot can be re-loaded later. Click on clear to remove the data displayed in the plots.
 
 
 <a id="section-2"></a>
 
 ## How to use the SCVD file
 
-SCVD file is used to convert received values in event recorder to human readable information. The file is in XML format, and it's compatible with ARM SCVD file with very tiny difference. Due to the time limit, only part of corresponding SCVD features in ARM are implemented in MPLABX.
+SCVD file describes how captured values and IDs should be formatted to a more human readable form. The file is in XML format, and comply to a subset of the ARM SCVD file format.
 Example SCVD file:
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
@@ -128,7 +128,7 @@ Example SCVD file:
 |xmlns:xs|Specifies the underlying XML schema to which the SCVD schema is compliant. Has to be set to: "http://www.w3.org/2001/XMLSchema-instance"|xs:decimal|required|
 |xs:noNamespaceSchemaLocation|Specifies the file name of the SCVD Schema: "Component_Viewer.xsd"|xs:string|optional|
 |schemaVersion|Specifies the compliant SCVD schema version (for example, "1.1")|xs:string|optional|
-|**Child Elements**|**Description**|**Type**|**Occurence**|
+|**Child Elements**|**Description**|**Type**|**Occurrence**|
 |component|Name of component and version of this SCVD file|Components Type|0..1|
 |events|Group element for one or more event elements|Events Type|0..1|
 |plots|Definition of plots in event recorder user interface|Plots Type|0..1|
@@ -172,7 +172,7 @@ Example SCVD file:
 |events|/component_viewer/events|||
 |**Attributes**|**Description**|**Type**|**Use**|
 |name|Define the name of a group. This name is used for filtering.|xs:string|required|
-|**Child Element**|**Description**|**Type**|**Occurence**|
+|**Child Element**|**Description**|**Type**|**Occurrence**|
 |component|Component within the group|ComponentType|0..*|
 
 ### 1.2.2.1 /Component_viewer/events/group/component
